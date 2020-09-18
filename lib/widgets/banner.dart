@@ -13,30 +13,36 @@ class BannerWidget extends StatefulWidget {
 
 class _BannerWidgetState extends State<BannerWidget>
     with SingleTickerProviderStateMixin {
-  ScrollController _controller = new ScrollController();
-  int _size;
   List<String> _imgPath;
-  double _marginRight = 20;
-  Timer _timer;
+  int _size;
   int _activeIndex = 0;
+  Timer _timer;
+  double width = 0;
+  double _marginRight = 20.0;
+  double _dx;
+  ScrollController _controller = new ScrollController();
+  Duration _durationBanner = Duration(seconds: 4);
+  Duration _animateDration = Duration(milliseconds: 500);
 
   @override
   void initState() {
     super.initState();
     _size = widget.imgPath.length;
     _imgPath = widget.imgPath;
-    //监听滚动事件，打印滚动位置
-    _controller.addListener(() {
-      print(_controller.offset); //打印滚动位置
-    });
+    _startTimer();
   }
 
   @override
   void dispose() {
-    //为了避免内存泄露，需要调用_controller.dispose
     _controller.dispose();
-    _timer.cancel();
+    _clearTimer();
     super.dispose();
+  }
+
+  void _setDx(double dx) {
+    setState(() {
+      _dx = dx;
+    });
   }
 
   List<Widget> _createdIconList(BuildContext context) {
@@ -82,9 +88,8 @@ class _BannerWidgetState extends State<BannerWidget>
     return list;
   }
 
-  void _startTimer(width) {
+  void _startTimer() {
     if (_timer == null) {
-      Duration duration = Duration(seconds: 2);
       var callback = (timer) => {
             setState(() {
               if (_activeIndex == _size - 1) {
@@ -93,44 +98,99 @@ class _BannerWidgetState extends State<BannerWidget>
                 _activeIndex++;
               }
             }),
-            _controller.jumpTo((width + _marginRight) * _activeIndex)
+            _bannerAnimate()
           };
-      _timer = Timer.periodic(duration, callback);
+      _timer = Timer.periodic(_durationBanner, callback);
     }
+  }
+
+  void _bannerAnimate() {
+    _controller.animateTo((width + _marginRight) * _activeIndex,
+        duration: _animateDration, curve: Curves.linear);
+  }
+
+  void _clearTimer() {
+    _timer?.cancel();
+    _timer = null;
   }
 
   @override
   Widget build(BuildContext context) {
-    // _timer?.cancel();
-    return LayoutBuilder(builder: (context, constraints) {
-      final double endWidth = constraints.biggest.width;
-      _startTimer(endWidth);
-      return Container(
-        width: double.infinity,
-        child: Stack(
-          alignment: Alignment.center, //指定未定位或部分定位widget的对齐方式
-          children: <Widget>[
-            Positioned(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: _createdItemList(endWidth),
-                ),
-                controller: _controller,
-              ),
-            ),
-            Positioned(
-                bottom: 10,
-                child: Container(
-                  height: 10,
+    return GestureDetector(
+      child: LayoutBuilder(builder: (context, constraints) {
+        if (width == 0) {
+          width = constraints.biggest.width;
+        }
+
+        return Container(
+          width: double.infinity,
+          child: Stack(
+            alignment: Alignment.center, //指定未定位或部分定位widget的对齐方式
+            children: <Widget>[
+              Positioned(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: new NeverScrollableScrollPhysics(),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: _createdIconList(context),
+                    children: _createdItemList(width),
                   ),
-                )),
-          ],
-        ),
-      );
-    });
+                  controller: _controller,
+                ),
+              ),
+              Positioned(
+                  bottom: 10,
+                  child: Container(
+                    height: 10,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: _createdIconList(context),
+                    ),
+                  )),
+            ],
+          ),
+        );
+      }),
+      onLongPressStart: (LongPressStartDetails e) {
+        _clearTimer();
+        print("onLongPressStart");
+      },
+      onLongPressUp: () {
+        _startTimer();
+        print("onLongPressUp");
+      },
+      onHorizontalDragStart: (DragStartDetails e) {
+        _clearTimer();
+        _setDx(0);
+      },
+      onHorizontalDragUpdate: (DragUpdateDetails e) {
+        // dx 负数：向左滑动； 整数：向右滑动
+        // print("dx: ${e.delta.dx}, dy: ${e.delta.dy}");
+        _setDx(e.delta.dx);
+      },
+      onHorizontalDragEnd: (DragEndDetails e) {
+        int index = _activeIndex;
+        if (_dx < 0) {
+          index++;
+        }
+        if (_dx > 0) {
+          index--;
+        }
+
+        setState(() {
+          if (index == _size) {
+            _activeIndex = 0;
+          } else if (index < 0) {
+            _activeIndex = _size - 1;
+          } else {
+            _activeIndex = index;
+          }
+        });
+        _bannerAnimate();
+
+        _startTimer();
+        //打印滑动结束时在x、y轴上的速度
+        // print(e.velocity);
+      },
+    );
   }
 }
