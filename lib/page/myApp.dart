@@ -79,9 +79,8 @@ class _MyAppWidgetState extends State<MyAppWidget> {
               backgroundColor: Theme.of(context).primaryColor,
               shadowColor: Colors.transparent),
           preferredSize: Size.fromHeight(0)),
-      body: SafeArea(
-          child: Container(
-              child: Column(children: [
+      body: Container(
+          child: Column(children: [
         Expanded(child: _selectPage()),
         Row(
           children: [
@@ -89,36 +88,7 @@ class _MyAppWidgetState extends State<MyAppWidget> {
               _bottomBtn(context, _navigations[i], i, _onItemTapped)
           ],
         )
-      ]))),
+      ])),
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     body: Center(
-  //       child: _selectPage(),
-  //     ),
-  //     bottomNavigationBar: BottomNavigationBar(
-  //         items: const <BottomNavigationBarItem>[
-  //           BottomNavigationBarItem(
-  //             icon: Icon(Icons.home),
-  //             title: Text('Home'),
-  //           ),
-  //           BottomNavigationBarItem(
-  //             icon: Icon(Icons.business),
-  //             title: Text('Business'),
-  //           ),
-  //           BottomNavigationBarItem(
-  //             icon: Icon(Icons.school),
-  //             title: Text('School'),
-  //           ),
-  //         ],
-  //         currentIndex: _selectedIndex,
-  //         selectedItemColor: Colors.black,
-  //         // selectedItemColor: Colors.amber[800],
-  //         onTap: _onItemTapped,
-  //         selectedFontSize: 12),
-  //   );
-  // }
 }
