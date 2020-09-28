@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protect_dev/common/bottomNavigation.dart';
+import 'package:protect_dev/store/recommendModel.dart';
+import 'package:provider/provider.dart';
 
 import 'recommend/index.dart';
 import 'Home1.dart';
@@ -7,7 +9,7 @@ import 'Home2.dart';
 import 'Home.dart';
 
 class MyAppWidget extends StatefulWidget {
-  MyAppWidget({Key key, this.bottomNavigation, this.activeIndex})
+  MyAppWidget({Key key, this.bottomNavigation, this.activeIndex = 0})
       : super(key: key);
 
   final List<BottomNavigation> bottomNavigation;
@@ -38,7 +40,7 @@ class _MyAppWidgetState extends State<MyAppWidget> {
     Widget currentWidget = Home();
     switch (_selectedIndex) {
       case 0:
-        currentWidget = getRecommend();
+        currentWidget = Recommend();
         break;
       case 1:
         currentWidget = Home1();
@@ -73,22 +75,30 @@ class _MyAppWidgetState extends State<MyAppWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-          child: AppBar(
-              backgroundColor: Theme.of(context).primaryColor,
-              shadowColor: Colors.transparent),
-          preferredSize: Size.fromHeight(0)),
-      body: Container(
-          child: Column(children: [
-        Expanded(child: _selectPage()),
-        Row(
-          children: [
-            for (int i = 0; i < _navigations.length; i++)
-              _bottomBtn(context, _navigations[i], i, _onItemTapped)
-          ],
-        )
-      ])),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => RecommendModel()),
+          ChangeNotifierProvider(create: (_) => Counter())
+          // ModelWidget(create: (context) => RecommendModel()),
+          // Provider<RecommendModel>(create: (_) => RecommendModel()),
+        ],
+        child: Scaffold(
+          appBar: PreferredSize(
+              child: AppBar(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  shadowColor: Colors.transparent),
+              preferredSize: Size.fromHeight(0)),
+          body: Container(
+              padding: EdgeInsets.only(bottom: 20),
+              child: Column(children: [
+                Expanded(child: _selectPage()),
+                Row(
+                  children: [
+                    for (int i = 0; i < _navigations.length; i++)
+                      _bottomBtn(context, _navigations[i], i, _onItemTapped)
+                  ],
+                )
+              ])),
+        ));
   }
 }

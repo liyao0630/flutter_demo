@@ -5,11 +5,15 @@ class TabLeftWidget extends StatefulWidget {
       {Key key,
       @required this.tabs,
       @required this.tabViews,
+      this.tabIndex = 0,
+      this.tabEvent,
       this.activeTextStyle = const TextStyle(color: Colors.white, fontSize: 20),
       this.textStyle = const TextStyle(color: Colors.white),
       this.activeBoxDecoration})
       : super(key: key);
 
+  final int tabIndex;
+  final Function tabEvent;
   final List<String> tabs;
   final List<Widget> tabViews;
   final TextStyle activeTextStyle;
@@ -25,19 +29,20 @@ class _TabLeftWidgetState extends State<TabLeftWidget>
   List<String> _tabs;
   List<Widget> _tabViews;
   TabController _tabController;
-  int _tabIndex = 0;
+  int _tabIndex;
 
   @override
   void initState() {
     super.initState();
-
+    _tabIndex = widget.tabIndex;
     _tabs = widget.tabs;
     _tabViews = widget.tabViews;
-
     _tabController = TabController(vsync: this, length: _tabs.length)
       ..addListener(() {
         _indexChange(_tabController.index);
       });
+    _tabController.index = _tabIndex;
+    // _tabController.
   }
 
   @override
@@ -47,6 +52,9 @@ class _TabLeftWidgetState extends State<TabLeftWidget>
   }
 
   void _indexChange(index) {
+    if (widget.tabEvent != null) {
+      widget.tabEvent(index);
+    }
     setState(() {
       _tabIndex = index;
     });

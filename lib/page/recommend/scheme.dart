@@ -1,23 +1,54 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/banner.dart';
 import '../../widgets/tab_icon.dart';
+import '../../store/recommendModel.dart';
 
 class Scheme extends StatefulWidget {
   Scheme({Key key}) : super(key: key);
-
+  // final Function changeTabIndex;
   @override
   _SchemeState createState() => _SchemeState();
 }
 
 class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
+  bool loadTopState = false;
+  bool loadBottomState = false;
   List<String> _expertTabs = ['足球专家', '篮球专家'];
   List<Map<String, String>> _footballExpertData;
   List<Map<String, String>> _basketballExpertData;
+  List<Widget> _scrollList = [];
   List<String> _bannerPath;
+  double _mainHeight;
+  ScrollController _controller;
+
+  double winWidth(BuildContext context) {
+    return MediaQuery.of(context).size.width;
+  }
 
   @override
   void initState() {
     super.initState();
+    _controller = ScrollController()
+      ..addListener(() {
+        // 顶部状态管理
+        var offset = _controller.offset;
+        // print('_controlle $offset');
+        if (offset == 0) {
+          if (loadTopState == false) {
+            loadTopState = true;
+            print('_controller开始加载 $offset');
+          } else {
+            print('_controller加载中 $offset');
+            print(_controller.position.maxScrollExtent);
+          }
+        }
+        if (offset == _controller.position.maxScrollExtent) {
+          print('_controller到底了 $offset');
+        }
+      });
     _bannerPath = [
       'https://hl-static.haoliao188.com/banner/202009/11/cc623f4e133681e3f4538bdfb1492d9a.png',
       'lib/assets/banner2.png',
@@ -148,6 +179,13 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
     ];
   }
 
+  void _createListItem() {
+    _scrollList.add(TabIconWidget(tabs: _expertTabs, tabViews: [
+      _tabIcon(context, _footballExpertData),
+      _tabIcon(context, _basketballExpertData)
+    ]));
+  }
+
   Widget _tabIcon(context, List<Map<String, String>> data) {
     List<Widget> list = [];
     List<Widget> icon = [];
@@ -233,30 +271,114 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // Navigator.of(context).pushNamed("expert");
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    alignment: Alignment.topCenter,
-                    image: AssetImage('lib/assets/bannerBg.png'))),
-            child: BannerWrapWidget(
-              imgPath: _bannerPath,
+    // Widget columnWidget = Column(
+    // _createListItem();
+    // _createListItem();
+    Widget mainWrap = SingleChildScrollView(
+        controller: _controller,
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      alignment: Alignment.topCenter,
+                      image: AssetImage('lib/assets/bannerBg.png'))),
+              child: BannerWrapWidget(
+                imgPath: _bannerPath,
+              ),
             ),
-          ),
-          TabIconWidget(tabs: _expertTabs, tabViews: [
-            _tabIcon(context, _footballExpertData),
-            _tabIcon(context, _basketballExpertData)
-          ]),
-          Text(
-            '方案' * 2000,
-            textAlign: TextAlign.center,
-          )
-        ],
-      ),
-    );
+            TabIconWidget(tabs: _expertTabs, tabViews: [
+              _tabIcon(context, _footballExpertData),
+              _tabIcon(context, _basketballExpertData)
+            ]),
+            TabIconWidget(tabs: _expertTabs, tabViews: [
+              _tabIcon(context, _footballExpertData),
+              _tabIcon(context, _basketballExpertData)
+            ]),
+            TabIconWidget(tabs: _expertTabs, tabViews: [
+              _tabIcon(context, _footballExpertData),
+              _tabIcon(context, _basketballExpertData)
+            ]),
+            Container(
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                  // borderRadius: BorderRadius.circular(80),
+                  color: Colors.grey[200]),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(80),
+                    color: Colors.white),
+                child: Row(children: [
+                  Container(
+                    width: (winWidth(context) - 40) / 3 - 5,
+                    child: FlatButton(
+                        padding: EdgeInsets.only(left: 15),
+                        onPressed: null,
+                        child: Row(
+                          children: [
+                            Icon(Icons.ac_unit),
+                            Expanded(
+                                child: Text(
+                              '专家干货${Provider.of<RecommendModel>(context).tabIndex}',
+                              textAlign: TextAlign.center,
+                            )),
+                            Text('|')
+                          ],
+                        )),
+                  ),
+                  Container(
+                    width: (winWidth(context) - 40) / 3 + 10,
+                    child: FlatButton(
+                        padding: EdgeInsets.only(left: 15),
+                        onPressed: null,
+                        child: Row(
+                          children: [
+                            Icon(Icons.ac_unit),
+                            Expanded(
+                                child: Text(
+                              '每日红人榜${Provider.of<Counter>(context).count}',
+                              textAlign: TextAlign.center,
+                            )),
+                            Text('|')
+                          ],
+                        )),
+                  ),
+                  Container(
+                    width: (winWidth(context) - 40) / 3 - 5,
+                    child: FlatButton(
+                        padding: EdgeInsets.only(left: 15),
+                        onPressed: null,
+                        child: Row(
+                          children: [
+                            Icon(Icons.ac_unit),
+                            Expanded(
+                                child: Text(
+                              '免费方案',
+                              textAlign: TextAlign.center,
+                            ))
+                          ],
+                        )),
+                  )
+                ]),
+              ),
+            ),
+            Container(
+              child: Column(
+                children: _scrollList,
+              ),
+            )
+          ],
+        ));
+
+    // Future.delayed(Duration(milliseconds: 200), () {
+    //   var size = context?.findRenderObject()?.paintBounds?.size;
+    //   // _setMainHeight(size.height);
+    //   print(size.height);
+    //   print(window.physicalSize.height);
+    //   print(MediaQuery.of(context).size.height);
+    //   print(_controller.position.maxScrollExtent);
+    // });
+    return mainWrap;
   }
 }

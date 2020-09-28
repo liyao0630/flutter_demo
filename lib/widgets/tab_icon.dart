@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 class TabIconWidget extends StatefulWidget {
-  TabIconWidget({Key key, @required this.tabs, @required this.tabViews})
+  TabIconWidget(
+      {Key key,
+      @required this.tabs,
+      @required this.tabViews,
+      this.tabIndex = 0})
       : super(key: key);
 
+  final int tabIndex;
   final List<String> tabs;
   final List<Widget> tabViews;
 
@@ -16,12 +21,13 @@ class _TabIconWidgetState extends State<TabIconWidget>
   List<String> _tabs;
   List<Widget> _tabViews;
   TabController _tabController;
-  int _tabIndex = 0;
+  int _tabIndex;
 
   @override
   void initState() {
     super.initState();
 
+    _tabIndex = widget.tabIndex;
     _tabs = widget.tabs;
     _tabViews = widget.tabViews;
 
@@ -100,9 +106,14 @@ class _TabIconWidgetState extends State<TabIconWidget>
                         top: BorderSide.none)),
                 tabs: _createdTabs())),
         Padding(
-          padding: EdgeInsets.only(top: 6, bottom: 10),
+          padding: EdgeInsets.only(top: 6, right: 20, bottom: 10, left: 20),
           child: getTabView(),
-        )
+        ),
+        // Expanded(
+        //     child: TabBarView(
+        //   controller: _tabController,
+        //   children: _tabViews,
+        // ))
       ],
     );
   }
