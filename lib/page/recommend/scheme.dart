@@ -21,7 +21,7 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
   List<Map<String, String>> _basketballExpertData;
   List<Widget> _scrollList = [];
   List<String> _bannerPath;
-  double _mainHeight;
+  // double _mainHeight;
   ScrollController _controller;
 
   double winWidth(BuildContext context) {
@@ -179,12 +179,12 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
     ];
   }
 
-  void _createListItem() {
-    _scrollList.add(TabIconWidget(tabs: _expertTabs, tabViews: [
-      _tabIcon(context, _footballExpertData),
-      _tabIcon(context, _basketballExpertData)
-    ]));
-  }
+  // void _createListItem() {
+  //   _scrollList.add(TabIconWidget(tabs: _expertTabs, tabViews: [
+  //     _tabIcon(context, _footballExpertData),
+  //     _tabIcon(context, _basketballExpertData)
+  //   ]));
+  // }
 
   Widget _tabIcon(context, List<Map<String, String>> data) {
     List<Widget> list = [];

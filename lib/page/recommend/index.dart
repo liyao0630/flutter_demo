@@ -20,7 +20,9 @@ class _RecommendState extends State<Recommend> {
     super.initState();
   }
 
-  void changeTabIndex(int index) {}
+  void _changeTabIndex(int index) {
+    Provider.of<RecommendModel>(context).tabIndexAction(index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,6 @@ class _RecommendState extends State<Recommend> {
           Experts(),
           Free(),
         ],
-        tabEvent: Provider.of<RecommendModel>(context).tabIndexAction);
+        tabEvent: _changeTabIndex);
   }
 }
