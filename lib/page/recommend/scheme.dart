@@ -210,6 +210,7 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
     var tate = _contentTabs[_contentTabsIndex];
     var index = listPage * listSize;
     List<Widget> list;
+    List<Widget> listAdd = [];
     switch (_contentTabsIndex) {
       case 0:
         list = _scrollList0;
@@ -223,14 +224,15 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
     }
     // var list = '_scrollList' + tate;
     for (var i = index - listSize; i < index; i++) {
-      setState(() {
-        list.add(Container(
-          height: 60,
-          child: Text('$tate - $i'),
-        ));
-      });
-      print(list.length);
+      listAdd.add(Container(
+        height: 60,
+        child: Text('$tate - $i'),
+      ));
     }
+    setState(() {
+      list.addAll(listAdd);
+    });
+    // print(list.length);
   }
 
   void _chengContentIndex(index) {

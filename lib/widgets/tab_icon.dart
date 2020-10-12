@@ -87,7 +87,6 @@ class _TabIconWidgetState extends State<TabIconWidget>
 
   @override
   Widget build(BuildContext context) {
-    print('sdfdsfsdfdf');
     return Column(
       children: [
         Container(
