@@ -1,10 +1,10 @@
-import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/banner.dart';
 import '../../widgets/tab_icon.dart';
-import '../../widgets/tab_list.dart';
+import '../../store/recommendModel.dart';
 
 class Scheme extends StatefulWidget {
   Scheme({Key key, this.changeTabIndex}) : super(key: key);
@@ -17,18 +17,10 @@ class Scheme extends StatefulWidget {
 class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
   bool loadTopState = false;
   bool loadBottomState = false;
-  int listLength = 300;
-  int listPage = 0;
-  int listSize = 10;
-  TabListWidget contentIconWidget;
   List<String> _expertTabs = ['足球专家', '篮球专家'];
-  List<String> _contentTabs = ['全部', '足球', '篮球'];
-  int _contentTabsIndex = 0;
   List<Map<String, String>> _footballExpertData;
   List<Map<String, String>> _basketballExpertData;
-  List<Widget> _scrollList0 = [];
-  List<Widget> _scrollList1 = [];
-  List<Widget> _scrollList2 = [];
+  List<Widget> _scrollList = [];
   List<String> _bannerPath;
   // double _mainHeight;
   ScrollController _controller;
@@ -48,29 +40,14 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
         if (offset == 0) {
           if (loadTopState == false) {
             loadTopState = true;
-            print('_controller 到头部 开始刷新 $offset');
+            print('_controller开始加载 $offset');
           } else {
-            print('_controller 头部加载中 $offset');
+            print('_controller加载中 $offset');
+            print(_controller.position.maxScrollExtent);
           }
         }
         if (offset == _controller.position.maxScrollExtent) {
-          if (loadBottomState == false) {
-            loadBottomState = true;
-            const timeout = const Duration(seconds: 5);
-            print('currentTime=' + DateTime.now().toString());
-            Timer(timeout, () {
-              _setScrollList();
-              loadBottomState = false;
-              //到时回调
-              print('afterTimer=' + DateTime.now().toString());
-            });
-
-            print('_controller 到底部 加载更多 $offset');
-          } else {
-            print('_controller 底部加载中 $offset');
-            // print(_controller.position.maxScrollExtent);
-
-          }
+          print('_controller到底了 $offset');
         }
       });
     _bannerPath = [
@@ -201,58 +178,14 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
         'rate': '100'
       },
     ];
-    _setScrollList();
   }
 
-  void _setScrollList() {
-    // contentIconWidget.getCurrentTabIndex();
-    listPage++;
-    var tate = _contentTabs[_contentTabsIndex];
-    var index = listPage * listSize;
-    List<Widget> list;
-    switch (_contentTabsIndex) {
-      case 0:
-        list = _scrollList0;
-        break;
-      case 1:
-        list = _scrollList1;
-        break;
-      default:
-        list = _scrollList2;
-        break;
-    }
-    // var list = '_scrollList' + tate;
-    for (var i = index - listSize; i < index; i++) {
-      setState(() {
-        list.add(Container(
-          height: 60,
-          child: Text('$tate - $i'),
-        ));
-      });
-      print(list.length);
-    }
-  }
-
-  void _chengContentIndex(index) {
-    setState(() {
-      _contentTabsIndex = index;
-    });
-    List<Widget> list;
-    switch (index) {
-      case 0:
-        list = _scrollList0;
-        break;
-      case 1:
-        list = _scrollList1;
-        break;
-      default:
-        list = _scrollList2;
-        break;
-    }
-    if (list.length == 0) {
-      _setScrollList();
-    }
-  }
+  // void _createListItem() {
+  //   _scrollList.add(TabIconWidget(tabs: _expertTabs, tabViews: [
+  //     _tabIcon(context, _footballExpertData),
+  //     _tabIcon(context, _basketballExpertData)
+  //   ]));
+  // }
 
   Widget _tabIcon(context, List<Map<String, String>> data) {
     List<Widget> list = [];
@@ -341,102 +274,107 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    contentIconWidget = TabListWidget(
-        tabs: _contentTabs,
-        tabViews: [
-          _scrollList0,
-          _scrollList1,
-          _scrollList2,
-        ],
-        callback: (index) => {_chengContentIndex(index)});
-
-    // contentIconWidget.currentIndex;
-    Widget mainWrap = SingleChildScrollView(
-        controller: _controller,
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      alignment: Alignment.topCenter,
-                      image: AssetImage('lib/assets/bannerBg.png'))),
-              child: BannerWrapWidget(
-                imgPath: _bannerPath,
+    // Widget columnWidget = Column(
+    // _createListItem();
+    // _createListItem();
+    Widget mainWrap = Column(
+      children: [
+        Container(
+          padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  alignment: Alignment.topCenter,
+                  image: AssetImage('lib/assets/bannerBg.png'))),
+          child: BannerWrapWidget(
+            imgPath: _bannerPath,
+          ),
+        ),
+        TabIconWidget(tabs: _expertTabs, tabViews: [
+          _tabIcon(context, _footballExpertData),
+          _tabIcon(context, _basketballExpertData)
+        ]),
+        Container(
+          padding: EdgeInsets.all(15),
+          decoration: BoxDecoration(
+              // borderRadius: BorderRadius.circular(80),
+              color: Colors.grey[200]),
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(80), color: Colors.white),
+            child: Row(children: [
+              Container(
+                width: (winWidth(context) - 40) / 3 - 5,
+                child: FlatButton(
+                    padding: EdgeInsets.only(left: 15),
+                    onPressed: null,
+                    child: Row(
+                      children: [
+                        Icon(Icons.ac_unit),
+                        Expanded(
+                            child: Text(
+                          '专家干货${Provider.of<RecommendModel>(context).tabIndex}',
+                          textAlign: TextAlign.center,
+                        )),
+                        Text('|')
+                      ],
+                    )),
               ),
-            ),
-            TabIconWidget(tabs: _expertTabs, tabViews: [
-              _tabIcon(context, _footballExpertData),
-              _tabIcon(context, _basketballExpertData)
+              Container(
+                width: (winWidth(context) - 40) / 3 + 10,
+                child: FlatButton(
+                    padding: EdgeInsets.only(left: 15),
+                    onPressed: null,
+                    child: Row(
+                      children: [
+                        Icon(Icons.ac_unit),
+                        Expanded(
+                            child: Text(
+                          '每日红人榜${Provider.of<Counter>(context).count}',
+                          textAlign: TextAlign.center,
+                        )),
+                        Text('|')
+                      ],
+                    )),
+              ),
+              Container(
+                width: (winWidth(context) - 40) / 3 - 5,
+                child: FlatButton(
+                    padding: EdgeInsets.only(left: 15),
+                    onPressed: null,
+                    child: Row(
+                      children: [
+                        Icon(Icons.ac_unit),
+                        Expanded(
+                            child: Text(
+                          '免费方案',
+                          textAlign: TextAlign.center,
+                        ))
+                      ],
+                    )),
+              )
             ]),
-            Container(
-              padding: EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                  // borderRadius: BorderRadius.circular(80),
-                  color: Colors.grey[200]),
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(80),
-                    color: Colors.white),
-                child: Row(children: [
-                  Container(
-                    width: (winWidth(context) - 40) / 3 - 5,
-                    child: FlatButton(
-                        padding: EdgeInsets.only(left: 15),
-                        onPressed: null,
-                        child: Row(
-                          children: [
-                            Icon(Icons.ac_unit),
-                            Expanded(
-                                child: Text(
-                              '专家干货',
-                              textAlign: TextAlign.center,
-                            )),
-                            Text('|')
-                          ],
-                        )),
-                  ),
-                  Container(
-                    width: (winWidth(context) - 40) / 3 + 10,
-                    child: FlatButton(
-                        padding: EdgeInsets.only(left: 15),
-                        onPressed: null,
-                        child: Row(
-                          children: [
-                            Icon(Icons.ac_unit),
-                            Expanded(
-                                child: Text(
-                              '每日红人榜',
-                              textAlign: TextAlign.center,
-                            )),
-                            Text('|')
-                          ],
-                        )),
-                  ),
-                  Container(
-                    width: (winWidth(context) - 40) / 3 - 5,
-                    child: FlatButton(
-                        padding: EdgeInsets.only(left: 15),
-                        onPressed: null,
-                        child: Row(
-                          children: [
-                            Icon(Icons.ac_unit),
-                            Expanded(
-                                child: Text(
-                              '免费方案',
-                              textAlign: TextAlign.center,
-                            ))
-                          ],
-                        )),
-                  )
-                ]),
-              ),
-            ),
-            contentIconWidget,
-            Text('加载中～～～')
-          ],
-        ));
+          ),
+        ),
+        Container(
+          child: Column(
+            children: _scrollList,
+          ),
+        ),
+      ],
+    );
 
-    return mainWrap;
+    return Flex(
+      direction: Axis.vertical,
+      children: [
+        mainWrap,
+        Expanded(
+            child: ListView.builder(
+                itemCount: 100,
+                itemExtent: 50.0, //强制高度为50.0
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(title: Text("$index"));
+                }))
+      ],
+    );
   }
 }

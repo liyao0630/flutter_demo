@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 
-class TabIconWidget extends StatefulWidget {
-  TabIconWidget(
+class TabListWidget extends StatefulWidget {
+  TabListWidget(
       {Key key,
       @required this.tabs,
       @required this.tabViews,
+      this.callback,
       this.tabIndex = 0})
       : super(key: key);
 
   final int tabIndex;
   final List<String> tabs;
-  final List<Widget> tabViews;
+  final List<List<Widget>> tabViews;
+  final Function callback;
 
   @override
-  _TabIconWidgetState createState() => _TabIconWidgetState();
+  _TabListWidgetState createState() => _TabListWidgetState();
 }
 
-class _TabIconWidgetState extends State<TabIconWidget>
+class _TabListWidgetState extends State<TabListWidget>
     with SingleTickerProviderStateMixin {
   List<String> _tabs;
-  List<Widget> _tabViews;
+  List<List<Widget>> _tabViews;
   TabController _tabController;
   int _tabIndex;
+
+  int get currentIndex => _tabIndex;
 
   @override
   void initState() {
@@ -46,7 +50,7 @@ class _TabIconWidgetState extends State<TabIconWidget>
     });
   }
 
-  Widget _getTabView() {
+  List<Widget> _getTabView() {
     return _tabViews[_tabIndex];
   }
 
@@ -87,7 +91,6 @@ class _TabIconWidgetState extends State<TabIconWidget>
 
   @override
   Widget build(BuildContext context) {
-    print('sdfdsfsdfdf');
     return Column(
       children: [
         Container(
@@ -98,7 +101,10 @@ class _TabIconWidgetState extends State<TabIconWidget>
                         style: BorderStyle.solid,
                         width: 1))),
             child: TabBar(
-                onTap: (index) => {_indexChange(index)},
+                onTap: (index) => {
+                      _indexChange(index),
+                      if (widget.callback != null) {widget.callback(index)}
+                    },
                 controller: _tabController,
                 indicatorWeight: 0.0,
                 indicator: BoxDecoration(
@@ -110,7 +116,10 @@ class _TabIconWidgetState extends State<TabIconWidget>
                 tabs: _createdTabs())),
         Padding(
           padding: EdgeInsets.only(top: 6, right: 20, bottom: 10, left: 20),
-          child: _getTabView(),
+          child: Flex(
+            direction: Axis.vertical,
+            children: _getTabView(),
+          ),
         )
       ],
     );

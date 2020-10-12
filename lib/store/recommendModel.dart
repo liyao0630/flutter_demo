@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 
 //定义需要共享的数据模型，通过混入ChangeNotifier管理听众
 class RecommendModel with ChangeNotifier {
-  int _tabIndex = 1;
+  int _tabIndex = 0;
   //读方法
   int get tabIndex => _tabIndex;
   //写方法
   void tabIndexAction(int index) {
-    _tabIndex = index;
-    notifyListeners(); //通知听众刷新
+    if (index != _tabIndex) {
+      _tabIndex = index;
+      notifyListeners(); //通知听众刷新
+    }
   }
 }
 

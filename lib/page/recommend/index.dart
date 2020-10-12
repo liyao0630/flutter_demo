@@ -20,22 +20,21 @@ class _RecommendState extends State<Recommend> {
     super.initState();
   }
 
-  void _changeTabIndex(int index) {
-    Provider.of<RecommendModel>(context).tabIndexAction(index);
-  }
-
   @override
   Widget build(BuildContext context) {
-    // print(MediaQuery.of(context).size.height);
-    // Provider.of<RecommendModel>(context).tabIndex;
+    RecommendModel recommendData = Provider.of<RecommendModel>(context);
+    void changeTabIndex(int index) {
+      recommendData.tabIndexAction(index);
+    }
+
     return TabLeftWidget(
-        tabIndex: Provider.of<RecommendModel>(context).tabIndex,
+        tabIndex: recommendData.tabIndex,
         tabs: ['方案', '专家', '免费'],
         tabViews: [
-          Scheme(),
+          Scheme(changeTabIndex: changeTabIndex),
           Experts(),
           Free(),
         ],
-        tabEvent: _changeTabIndex);
+        tabEvent: changeTabIndex);
   }
 }

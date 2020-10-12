@@ -5,8 +5,8 @@ class TabLeftWidget extends StatefulWidget {
       {Key key,
       @required this.tabs,
       @required this.tabViews,
+      @required this.tabEvent,
       this.tabIndex = 0,
-      this.tabEvent,
       this.activeTextStyle = const TextStyle(color: Colors.white, fontSize: 20),
       this.textStyle = const TextStyle(color: Colors.white),
       this.activeBoxDecoration})
@@ -29,20 +29,15 @@ class _TabLeftWidgetState extends State<TabLeftWidget>
   List<String> _tabs;
   List<Widget> _tabViews;
   TabController _tabController;
-  int _tabIndex;
+  bool tabInit = false;
 
   @override
   void initState() {
     super.initState();
-    _tabIndex = widget.tabIndex;
     _tabs = widget.tabs;
     _tabViews = widget.tabViews;
-    _tabController = TabController(vsync: this, length: _tabs.length)
-      ..addListener(() {
-        _indexChange(_tabController.index);
-      });
-    _tabController.index = _tabIndex;
-    // _tabController.
+    _tabController = TabController(vsync: this, length: _tabs.length);
+    _tabController.index = widget.tabIndex;
   }
 
   @override
@@ -51,20 +46,11 @@ class _TabLeftWidgetState extends State<TabLeftWidget>
     super.dispose();
   }
 
-  void _indexChange(index) {
-    if (widget.tabEvent != null) {
-      widget.tabEvent(index);
-    }
-    setState(() {
-      _tabIndex = index;
-    });
-  }
-
   List<Widget> _createdTabs() {
     List<Widget> tabs = [];
     Widget tab;
     for (var i = 0; i < _tabs.length; i++) {
-      if (i == _tabIndex) {
+      if (i == widget.tabIndex) {
         tab = Text(_tabs[i], style: widget.activeTextStyle);
       } else {
         tab = Text(_tabs[i], style: widget.textStyle);
@@ -76,8 +62,10 @@ class _TabLeftWidgetState extends State<TabLeftWidget>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.tabIndex != _tabController.index) {
+      _tabController.index = widget.tabIndex;
+    }
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Container(
           color: Theme.of(context).primaryColor,
@@ -89,6 +77,7 @@ class _TabLeftWidgetState extends State<TabLeftWidget>
                 child: TabBar(
                     controller: _tabController,
                     tabs: _createdTabs(),
+                    onTap: (index) => {widget.tabEvent(index)},
                     indicatorColor: Colors.transparent),
               )
             ],
