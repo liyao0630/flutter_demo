@@ -8,6 +8,7 @@ class RecommendModel with ChangeNotifier {
   int get tabIndex => _tabIndex;
   //写方法
   void tabIndexAction(int index) {
+    print('tabIndexAction $index');
     if (index != _tabIndex) {
       _tabIndex = index;
       notifyListeners(); //通知听众刷新

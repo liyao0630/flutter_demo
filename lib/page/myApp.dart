@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:protect_dev/common/bottomNavigation.dart';
 import 'package:protect_dev/store/recommendModel.dart';
 import 'package:provider/provider.dart';
 
@@ -9,31 +8,22 @@ import 'Home2.dart';
 import 'Home.dart';
 
 class MyAppWidget extends StatefulWidget {
-  MyAppWidget({Key key, this.bottomNavigation, this.activeIndex = 0})
-      : super(key: key);
+  MyAppWidget({Key key, this.activeIndex = 0}) : super(key: key);
 
-  final List<BottomNavigation> bottomNavigation;
   final int activeIndex;
 
   @override
   _MyAppWidgetState createState() => _MyAppWidgetState();
 }
 
-class _MyAppWidgetState extends State<MyAppWidget> {
-  int _selectedIndex = 0;
-  List<BottomNavigation> _navigations = [];
+class _MyAppWidgetState extends State<MyAppWidget>
+    with SingleTickerProviderStateMixin {
+  int _selectedIndex;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.activeIndex;
-    _navigations = widget.bottomNavigation;
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   Widget _selectPage() {
@@ -53,24 +43,10 @@ class _MyAppWidgetState extends State<MyAppWidget> {
     return currentWidget;
   }
 
-  Expanded _bottomBtn(BuildContext context, BottomNavigation config, int index,
-      Function changeEvent) {
-    Color textColor = Colors.grey;
-    if (index == _selectedIndex) {
-      textColor = Theme.of(context).primaryColor;
-    }
-    return Expanded(
-        child: FlatButton(
-            textColor: textColor,
-            color: Colors.transparent,
-            child: Column(
-              children: [config.icon, Text(config.text)],
-            ),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0)),
-            onPressed: () {
-              changeEvent(index);
-            }));
+  void _bottomNavigationBarTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -79,8 +55,6 @@ class _MyAppWidgetState extends State<MyAppWidget> {
         providers: [
           ChangeNotifierProvider(create: (_) => RecommendModel()),
           ChangeNotifierProvider(create: (_) => Counter())
-          // ModelWidget(create: (context) => RecommendModel()),
-          // Provider<RecommendModel>(create: (_) => RecommendModel()),
         ],
         child: Scaffold(
           appBar: PreferredSize(
@@ -88,17 +62,46 @@ class _MyAppWidgetState extends State<MyAppWidget> {
                   backgroundColor: Theme.of(context).primaryColor,
                   shadowColor: Colors.transparent),
               preferredSize: Size.fromHeight(0)),
-          body: Container(
-              padding: EdgeInsets.only(bottom: 20),
-              child: Column(children: [
-                Expanded(child: _selectPage()),
-                Row(
-                  children: [
-                    for (int i = 0; i < _navigations.length; i++)
-                      _bottomBtn(context, _navigations[i], i, _onItemTapped)
-                  ],
-                )
-              ])),
+          body: _selectPage(),
+          bottomNavigationBar: BottomNavigationBar(
+            // 底部导航
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.stars_rounded), label: '推荐'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.emoji_events), label: '赛事'),
+              BottomNavigationBarItem(icon: Icon(Icons.article), label: '资讯'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.video_collection), label: '视频'),
+              BottomNavigationBarItem(icon: Icon(Icons.person), label: '我的'),
+            ],
+            currentIndex: _selectedIndex,
+            fixedColor: Theme.of(context).primaryColor,
+            unselectedItemColor: Colors.grey,
+            showUnselectedLabels: true,
+            selectedFontSize: 12,
+            type: BottomNavigationBarType.fixed,
+            // @required this.items,
+            // this.onTap,
+            // this.currentIndex = 0,
+            // this.elevation,
+            // this.type,
+            // Color fixedColor,
+            // this.backgroundColor,
+            // this.iconSize = 24.0,
+            // Color selectedItemColor,
+            // this.unselectedItemColor,
+            // this.selectedIconTheme,
+            // this.unselectedIconTheme,
+            // this.selectedFontSize = 14.0,
+            // this.unselectedFontSize = 12.0,
+            // this.selectedLabelStyle,
+            // this.unselectedLabelStyle,
+            // this.showSelectedLabels = true,
+            // this.showUnselectedLabels,
+            // this.mouseCursor,
+            onTap: _bottomNavigationBarTap,
+          ),
         ));
   }
 }

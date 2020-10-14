@@ -25,8 +25,6 @@ class _TabListWidgetState extends State<TabListWidget>
   TabController _tabController;
   int _tabIndex;
 
-  int get currentIndex => _tabIndex;
-
   @override
   void initState() {
     super.initState();
@@ -52,10 +50,6 @@ class _TabListWidgetState extends State<TabListWidget>
 
   List<Widget> _getTabView() {
     return _tabViews[_tabIndex];
-  }
-
-  int getCurrentTabIndex() {
-    return _tabController.index;
   }
 
   List<Widget> _createdTabs() {
@@ -116,10 +110,7 @@ class _TabListWidgetState extends State<TabListWidget>
                 tabs: _createdTabs())),
         Padding(
           padding: EdgeInsets.only(top: 6, right: 20, bottom: 10, left: 20),
-          child: Flex(
-            direction: Axis.vertical,
-            children: _getTabView(),
-          ),
+          child: Flex(direction: Axis.vertical, children: _getTabView()),
         )
       ],
     );

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:protect_dev/common/bottomNavigation.dart';
 import '../page/myApp.dart';
 import '../page/Content_page.dart';
 import '../page/expert_page.dart';
@@ -29,16 +28,7 @@ Map<String, WidgetBuilder> routers = {
     // page build方法获取路由参数 var args=ModalRoute.of(context).settings.arguments;
 
     // 通过路由名跳转 Navigator.pushNamed(context, "/");
-    return MyAppWidget(
-      activeIndex: 0,
-      bottomNavigation: [
-        BottomNavigation(text: '推荐', icon: Icon(Icons.home)),
-        BottomNavigation(text: '赛事', icon: Icon(Icons.business)),
-        BottomNavigation(text: '资讯', icon: Icon(Icons.note)),
-        BottomNavigation(text: '视频', icon: Icon(Icons.video_library)),
-        BottomNavigation(text: '我的', icon: Icon(Icons.people)),
-      ],
-    );
+    return MyAppWidget();
   }
 };
 

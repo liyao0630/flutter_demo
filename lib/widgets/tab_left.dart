@@ -65,30 +65,33 @@ class _TabLeftWidgetState extends State<TabLeftWidget>
     if (widget.tabIndex != _tabController.index) {
       _tabController.index = widget.tabIndex;
     }
-    return Column(
-      children: [
-        Container(
-          color: Theme.of(context).primaryColor,
-          child: Row(
-            children: [
-              Container(
-                width: 260,
-                height: 50,
-                child: TabBar(
-                    controller: _tabController,
-                    tabs: _createdTabs(),
-                    onTap: (index) => {widget.tabEvent(index)},
-                    indicatorColor: Colors.transparent),
-              )
-            ],
-          ),
+    return Container(
+        child: Column(children: [
+      Container(
+        color: Theme.of(context).primaryColor,
+        child: Row(
+          children: [
+            Container(
+              width: 260,
+              height: 50,
+              child: TabBar(
+                  controller: _tabController,
+                  tabs: _createdTabs(),
+                  onTap: (index) => {widget.tabEvent(index)},
+                  indicatorColor: Colors.transparent),
+            )
+          ],
         ),
-        Expanded(
-            child: TabBarView(
-          controller: _tabController,
-          children: _tabViews,
-        ))
-      ],
-    );
+      ),
+      SingleChildScrollView(
+          child: TabBarView(
+        controller: _tabController,
+        children: _tabViews,
+      ))
+      // Container(
+      //     child: Flex(direction: Axis.vertical, children: [
+
+      // ]))
+    ]));
   }
 }
