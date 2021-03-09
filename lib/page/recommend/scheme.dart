@@ -324,7 +324,7 @@ class _SchemeState extends State<Scheme> with TickerProviderStateMixin {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(200),
                           child: Image.network(
-                              'http://customer.haoliao188.com/static/img/more_expert.ddbeb1c.png'),
+                              'https://customer.haoliao188.com/static/img/more_expert.ddbeb1c.png'),
                         )),
                     Text(
                       '更多大咖',
